@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+
+# Logs
+logs/
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Environment variable files
+.env
+.env.*
+
+# Puppeteer Chromium cache
+.chromium/
+
+# VS Code settings (optional)
+.vscode/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Profiles folder (cookie/session data - optional)
+profiles/
+
+# Configurations that should stay local
+config/*.json
+
+# OS metadata
+ehthumbs.db
+Icon?

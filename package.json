@@ -1,0 +1,12 @@
+{
+  "name": "10fastfingers",
+  "version": "1.0.0",
+  "description": "🎯 **Typing automation bot for 10FastFingers.com**   This bot simulates a human-like typing test on [10fastfingers.com](https://10fastfingers.com) with adjustable typing styles, dynamic WPM adjustment, wrong word simulation, and realistic delays.",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
