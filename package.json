@@ -1,12 +1,13 @@
 {
-  "name": "10fastfingers",
+  "name": "10fastfingers-bot",
   "version": "1.0.0",
-  "description": "🎯 **Typing automation bot for 10FastFingers.com**   This bot simulates a human-like typing test on [10fastfingers.com](https://10fastfingers.com) with adjustable typing styles, dynamic WPM adjustment, wrong word simulation, and realistic delays.",
-  "main": "bot.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "type": "module",
+  "dependencies": {
+    "chalk": "^5.0.0",
+    "fs-extra": "^11.1.1",
+    "ora": "^6.1.2",
+    "prompts": "^2.4.2",
+    "puppeteer-extra": "^3.3.4",
+    "puppeteer-extra-plugin-stealth": "^2.11.1"
+  }
 }
