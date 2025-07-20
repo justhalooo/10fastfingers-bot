@@ -1,6 +1,9 @@
 # ⚡ 10FastFingers Automation Bot
 
 
+![Demo GIF](demo/demo.gif)
+
+
 ## 📦 Features
 
 - ✅ **Basic / Advanced Typing Test automation**
