@@ -55,3 +55,9 @@ node bot.js
   - Human - Fatigue: 90-110 WPM (gradual fatigue)
   - Pro - Fast player: 130-145 WPM consistently fast
   - Random Natural Feel: 100-140 WPM mixed style
+## 💬 Issues / Discussions
+
+Found a bug? Have suggestions or ideas for improvements?  
+Feel free to [open an issue](https://github.com/justhalooo/10fastfingers-bot/issues) or start a [discussion](https://github.com/justhalooo/10fastfingers-bot/discussions).  
+
+We welcome feedback and contributions! 🎉
