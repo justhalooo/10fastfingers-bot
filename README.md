@@ -35,7 +35,11 @@ node bot.js
 
 ### 3️⃣ Follow CLI prompts:
 - **Enter profile name** (cookies saved in `/profiles`)
-- **Choose headless mode** (YES / NO)
+- **Choose headless mode** (YES / NO) | 
+**Headless mode explanation:**
+- **YES (headless):** The browser runs in the background without showing a window.
+- **NO (non-headless):** The browser window is visible so you can watch the typing ( Recommended )
+
 - **Select mode:**
   - Basic Typing Test
   - Advanced Typing Test
