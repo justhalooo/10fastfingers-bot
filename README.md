@@ -1,11 +1,6 @@
 # ⚡ 10FastFingers Automation Bot
 
 
-
-
-
----
-
 ## 📦 Features
 
 - ✅ **Basic / Advanced Typing Test automation**
@@ -26,9 +21,30 @@
 
 ---
 
-## 📦 Usage
+## 🚀 Usage
 
 ### 1️⃣ Install dependencies:
-
 ```bash
 npm install
+```
+
+### 2️⃣ Run the bot:
+```bash
+node bot.js
+```
+
+### 3️⃣ Follow CLI prompts:
+- **Enter profile name** (cookies saved in `/profiles`)
+- **Choose headless mode** (YES / NO)
+- **Select mode:**
+  - Basic Typing Test
+  - Advanced Typing Test
+  - Competition
+- **Select language:**
+  - English
+  - Indonesian
+- **Select typing style preset:**
+  - Human - Normal: 100-115 WPM
+  - Human - Fatigue: 90-110 WPM (gradual fatigue)
+  - Pro - Fast player: 130-145 WPM consistently fast
+  - Random Natural Feel: 100-140 WPM mixed style
