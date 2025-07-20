@@ -87,31 +87,93 @@ function computeCharBaseDelay(targetWPM) {
 
 async function ensureLogin(page, { username, password, profile }) {
   const spinner = ora('Checking login session...').start();
-  const isLogged = async () => page.evaluate(() => !!document.querySelector('a[href*="logout"], a[href*="/user/logout"], .user-info, a[href*="/profile"], .navigation_user'));
-  await page.goto(CONFIG.baseUrl, { waitUntil: 'domcontentloaded' });
-  await sleep(1200);
-  if (await isLogged()) { spinner.succeed('Already logged in (cookie still valid)'); return true; }
 
-  const loginTriggers = [
-    'a[href*="/login"]', 'a.login', 'button.login', 'a[href*="/user/login"]',
-    'a.navbar-login', 'li.login a', 'div.login a'
-  ];
-  for (const sel of loginTriggers) {
-    const el = await page.$(sel);
-    if (el) { await el.click(); await sleep(1500); break; }
+  const isLogged = async () =>
+    page.evaluate(() =>
+      !!document.querySelector(
+        'a[href*="logout"], a[href*="/user/logout"], .user-info, a[href*="/profile"], .navigation_user'
+      )
+    );
+
+  await page.goto(CONFIG.baseUrl, { waitUntil: 'domcontentloaded' });
+  await sleep(1500);
+
+  // 🛡️ Handle cookie consent banner (optional)
+  const cookieBtn = await page.$('button#CybotCookiebotDialogBodyLevelButtonLevelOptinAllowAll, .cookie-accept-all, .cc-accept');
+  if (cookieBtn) {
+    await cookieBtn.click();
+    await sleep(1000);
   }
 
+  if (await isLogged()) {
+    spinner.succeed('Already logged in (valid cookie session)');
+    return true;
+  }
+
+  // 👋 Ensure Login modal/button clicked if needed
+  const loginTriggers = [
+    'a[href*="/login"]',
+    'a.login',
+    'button.login',
+    'a[href*="/user/login"]',
+    'a.navbar-login',
+    'li.login a',
+    'div.login a'
+  ];
+
+  let clickedLogin = false;
+  for (const sel of loginTriggers) {
+    const el = await page.$(sel);
+    if (el) {
+      await el.click();
+      await sleep(1500);
+      clickedLogin = true;
+      break;
+    }
+  }
+
+  // Fallback navigate direct if still no form
   if (!(await page.$('input[type="password"], form[action*="login"] input'))) {
     await page.goto(CONFIG.baseUrl + '/login', { waitUntil: 'domcontentloaded' });
     await sleep(1200);
   }
 
-  const usernameSelectors = [ '#UserUsername', 'input#username', 'input[name="username"]', 'input[name="user[username]"]', 'input[name="data[User][username]"]', 'input[type="text"][name*="user"]', 'input[type="email"]', 'form[action*="login"] input[type="text"]', 'form[action*="login"] input[type="email"]' ];
-  const passwordSelectors = [ '#UserPassword', 'input#password', 'input[name="password"]', 'input[name="user[password]"]', 'input[name="data[User][password]"]', 'form[action*="login"] input[type="password"]', 'input[type="password"]' ];
-  const submitSelectors = [ 'button[type="submit"]', 'input[type="submit"]', 'form[action*="login"] button', 'form[action*="login"] input[type="submit"]', 'button.login', 'button.btn-primary' ];
+  // 🔎 Find input fields
+  const usernameSelectors = [
+    '#UserUsername',
+    'input#username',
+    'input[name="username"]',
+    'input[name="user[username]"]',
+    'input[name="data[User][username]"]',
+    'input[type="text"][name*="user"]',
+    'input[type="email"]',
+    'form[action*="login"] input[type="text"]',
+    'form[action*="login"] input[type="email"]'
+  ];
+
+  const passwordSelectors = [
+    '#UserPassword',
+    'input#password',
+    'input[name="password"]',
+    'input[name="user[password]"]',
+    'input[name="data[User][password]"]',
+    'form[action*="login"] input[type="password"]',
+    'input[type="password"]'
+  ];
+
+  const submitSelectors = [
+    'button[type="submit"]',
+    'input[type="submit"]',
+    'form[action*="login"] button',
+    'form[action*="login"] input[type="submit"]',
+    'button.login',
+    'button.btn-primary'
+  ];
 
   async function findFirst(pageOrFrame, selectors) {
-    for (const sel of selectors) { if (await pageOrFrame.$(sel)) return sel; }
+    for (const sel of selectors) {
+      if (await pageOrFrame.$(sel)) return sel;
+    }
     return null;
   }
 
@@ -126,7 +188,17 @@ async function ensureLogin(page, { username, password, profile }) {
     }
   }
 
-  spinner.text = 'Filling in credentials...';
+  if (!uSel || !pSel) {
+    spinner.fail('Login fields not found (UI might have changed)');
+    await fs.writeFile(
+      path.join(CONFIG.cookieDir, 'login_debug.html'),
+      await page.content()
+    );
+    console.log(chalk.yellow('Saved login_debug.html for inspection.'));
+    return false;
+  }
+
+  spinner.text = 'Filling credentials...';
   await page.click(uSel, { clickCount: 3 }).catch(() => {});
   await page.type(uSel, username, { delay: randInt(25, 70) });
   await page.click(pSel, { clickCount: 3 }).catch(() => {});
@@ -159,16 +231,20 @@ async function ensureLogin(page, { username, password, profile }) {
       const err = document.querySelector('.error, .alert-danger, .flash-error');
       return err ? err.textContent.trim() : null;
     });
-    if (loginError) console.log(chalk.red('Login error message: ' + loginError));
-    await fs.writeFile(path.join(CONFIG.cookieDir, 'last_login_page.html'), await page.content());
+    if (loginError) console.log(chalk.red('Login error: ' + loginError));
+    await fs.writeFile(
+      path.join(CONFIG.cookieDir, 'last_login_page.html'),
+      await page.content()
+    );
     spinner.fail('Login failed / UI changed.');
     return false;
   }
 
-  spinner.succeed('Login successful');
+  spinner.succeed('Login successful!');
   await saveCookies(page, profile);
   return true;
 }
+
 
 async function getWordList(page) {
   return await page.evaluate(() => {
@@ -420,7 +496,7 @@ async function main() {
 
     let loggedIn = false;
     if (await loadCookies(page, answers.profile)) {
-      await page.goto(`${CONFIG.baseUrl}/user/changeyouruserinprofile/`, { waitUntil: 'networkidle2' });
+      await page.goto(`${CONFIG.baseUrl}/user/changetoyouruser/`, { waitUntil: 'networkidle2' });
       await sleep(2000);
       loggedIn = await page.evaluate(() => !!document.querySelector('a[href*="logout"], a[href*="/user/logout"], .user-info, a[href*="/profile"], .navigation_user'));
     }
@@ -479,14 +555,14 @@ async function main() {
       await typeWords(page, words, wpmSequence);
     }
 
-    const { ulangi } = await prompts({
+    const { repeat } = await prompts({
       type: 'text',
-      name: 'ulangi',
+      name: 'repeat',
       message: 'Run again? (y/N)',
       initial: 'N'
     }, { onCancel });
 
-    if (!ulangi || ulangi.toLowerCase() !== 'y') {
+    if (!repeat || repeat.toLowerCase() !== 'y') {
       keepRunning = false;
       console.log(chalk.green('Closing browser...'));
     }
