@@ -420,7 +420,7 @@ async function main() {
 
     let loggedIn = false;
     if (await loadCookies(page, answers.profile)) {
-      await page.goto(`${CONFIG.baseUrl}/user/4290642/`, { waitUntil: 'networkidle2' });
+      await page.goto(`${CONFIG.baseUrl}/user/changeyouruserinprofile/`, { waitUntil: 'networkidle2' });
       await sleep(2000);
       loggedIn = await page.evaluate(() => !!document.querySelector('a[href*="logout"], a[href*="/user/logout"], .user-info, a[href*="/profile"], .navigation_user'));
     }
